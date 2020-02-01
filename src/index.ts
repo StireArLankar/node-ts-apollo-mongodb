@@ -15,7 +15,7 @@ const startServer = async () => {
   server.applyMiddleware({ app })
 
   await mongoose
-    .connect('mongodb://localhost:27017/test1', {
+    .connect('mongodb://mongo:27017/node-ta-apollo-mongodb', {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     })

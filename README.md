@@ -1,6 +1,8 @@
 # Node-typescript-apollo-mongodb
 
-- Local mongodb server
+## Now with docker!
+
+- Mongodb server
 - GraphQL with nested properties resolvers
 
 To start run
