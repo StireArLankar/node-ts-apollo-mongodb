@@ -6,6 +6,9 @@ services:
     build: .
     ports:
       - '80:4000'
+    volumes:
+      - ./src:/home/app/src
+      # - C:\Users\Stire\Desktop\projects\node-ts-apollo-mongodb\src:/home/app/src
     links:
       - mongo
   mongo:

@@ -1,14 +1,13 @@
 FROM node:12
 
-WORKDIR /usr/src/app
+WORKDIR /home/app/
 
 COPY package.json ./
 COPY yarn.lock ./
+COPY tsconfig.json ./
 
 RUN yarn
 
-COPY . .
-
 EXPOSE 4000
 
-CMD ["yarn", "start"]
+CMD yarn start
