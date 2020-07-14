@@ -1,8 +1,10 @@
 import { gql } from 'apollo-server-express'
 
 export const typeDefs = gql`
+  directive @upper on FIELD_DEFINITION
+
   type Query {
-    hello: String!
+    hello: String! @upper
     cats: [Cat!]!
     owners: [Owner!]!
   }
@@ -16,7 +18,7 @@ export const typeDefs = gql`
   type Cat {
     id: ID!
     name: String!
-    owner: Owner!
+    owner: Owner
   }
 
   type Mutation {

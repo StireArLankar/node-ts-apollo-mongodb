@@ -1,0 +1,18 @@
+schema:
+  - ./src/typeDefs/index.ts
+  - ./src/typeDefs/Cat.ts
+  - ./src/typeDefs/Owner.ts
+require:
+  - ts-node/register
+generates:
+  ./src/resolvers-types.ts:
+    config:
+      contextType: ./context#IContext
+      avoidOptionals: true
+      useIndexSignature: true
+      mappers:
+        Cat: ./models/Cat#ICat
+        Owner: ./models/Owner#IOwner
+    plugins:
+      - typescript
+      - typescript-resolvers

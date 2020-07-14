@@ -1,29 +1,36 @@
-import Cat, { ICat } from './models/Cat'
-import Owner, { IOwner } from './models/Owner'
+import Cat from './models/Cat'
+import Owner from './models/Owner'
 
-export const resolvers = {
+import { Resolvers } from './resolvers-types'
+
+export const resolvers: Resolvers = {
   Owner: {
-    cats: async (args: IOwner) => {
+    id: (args) => args.id,
+    name: (args) => args.name,
+    cats: async (args) => {
       return await Cat.find({ owner: args.id })
     },
   },
   Cat: {
-    owner: async (args: ICat) => {
+    id: (args) => args.id,
+    name: (args) => args.name,
+    owner: async (args) => {
       return await Owner.findById(args.owner)
     },
   },
   Query: {
     hello: () => 'hi',
-    cats: () => Cat.find(),
-    owners: () => Owner.find(),
+    cats: async () => Cat.find(),
+    owners: async () => Owner.find(),
   },
   Mutation: {
-    createCat: async (_: any, { name, owner }: ICat) => {
-      const kitty = new Cat({ name, owner })
+    _: async (_, __, ctx) => ctx.customField,
+    createCat: async (_, { input }) => {
+      const kitty = new Cat(input)
       await kitty.save()
       return kitty
     },
-    createOwner: async (_: any, { name }: IOwner) => {
+    createOwner: async (_, { name }) => {
       const man = new Owner({ name })
       await man.save()
       return man

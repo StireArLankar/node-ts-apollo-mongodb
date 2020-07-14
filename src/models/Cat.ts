@@ -17,4 +17,5 @@ const catSchema = new Schema<ICat>({
 })
 
 export const Cat = mongoose.model<ICat>('cat', catSchema)
+
 export default Cat
