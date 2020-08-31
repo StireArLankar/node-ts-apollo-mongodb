@@ -11,6 +11,11 @@ import {
 } from 'graphql'
 import { IContext } from './context'
 
+import session from 'express-session'
+import ConnectMongo from 'connect-mongo'
+
+const MongoStore = ConnectMongo(session)
+
 class UpperCaseDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(
     field: GraphQLField<any, any>,
@@ -35,6 +40,24 @@ class UpperCaseDirective extends SchemaDirectiveVisitor {
 const startServer = async () => {
   const app = express()
 
+  await mongoose
+    .connect('mongodb://mongo:27017/node-ta-apollo-mongodb', {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    })
+    .then(() => console.log('MongoDB is running'))
+    .catch((err: Error) => console.log(err))
+
+  app.use(
+    session({
+      name: 'qid',
+      secret: 'secret',
+      saveUninitialized: false, // don't create session until something stored
+      resave: false, //don't save session if unmodified
+      store: new MongoStore({ mongooseConnection: mongoose.connection, touchAfter: 24 * 3600 }),
+    })
+  )
+
   const server = new ApolloServer({
     typeDefs,
     resolvers,
@@ -46,19 +69,11 @@ const startServer = async () => {
 
       // const user = getUser(token);
 
-      return { customField: 'hello world' }
+      return { customField: 'hello world', req, res }
     },
   })
 
   server.applyMiddleware({ app })
-
-  await mongoose
-    .connect('mongodb://mongo:27017/node-ta-apollo-mongodb', {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    })
-    .then(() => console.log('MongoDB is running'))
-    .catch((err: Error) => console.log(err))
 
   app.listen({ port: 4000 }, () =>
     console.log(`Server ready at http://localhost:4000${server.graphqlPath}`)

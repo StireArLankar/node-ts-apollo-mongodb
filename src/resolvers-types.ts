@@ -38,6 +38,9 @@ export type Mutation = {
   createCat: Cat;
   createOwner: Owner;
   deleteCats: Scalars['String'];
+  login: Scalars['String'];
+  logout: Scalars['String'];
+  register: Scalars['String'];
 };
 
 
@@ -48,6 +51,18 @@ export type MutationCreateCatArgs = {
 
 export type MutationCreateOwnerArgs = {
   name: Scalars['String'];
+};
+
+
+export type MutationLoginArgs = {
+  login: Scalars['String'];
+  password: Scalars['String'];
+};
+
+
+export type MutationRegisterArgs = {
+  login: Scalars['String'];
+  password: Scalars['String'];
 };
 
 export type Owner = {
@@ -181,6 +196,9 @@ export type MutationResolvers<ContextType = IContext, ParentType extends Resolve
   createCat: Resolver<ResolversTypes['Cat'], ParentType, ContextType, RequireFields<MutationCreateCatArgs, 'input'>>;
   createOwner: Resolver<ResolversTypes['Owner'], ParentType, ContextType, RequireFields<MutationCreateOwnerArgs, 'name'>>;
   deleteCats: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  login: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'login' | 'password'>>;
+  logout: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  register: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'login' | 'password'>>;
 }>;
 
 export type OwnerResolvers<ContextType = IContext, ParentType extends ResolversParentTypes['Owner'] = ResolversParentTypes['Owner']> = ResolversObject<{

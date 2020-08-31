@@ -11,6 +11,9 @@ export const root = gql`
 
   type Mutation {
     _: String!
+    login(login: String!, password: String!): String!
+    logout: String!
+    register(login: String!, password: String!): String!
   }
 `
 

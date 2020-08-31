@@ -1,7 +1,9 @@
 import Cat from './models/Cat'
 import Owner from './models/Owner'
-
+import bcrypt from 'bcrypt'
 import { Resolvers } from './resolvers-types'
+import User from './models/User'
+import { AuthenticationError } from 'apollo-server-express'
 
 export const resolvers: Resolvers = {
   Owner: {
@@ -21,7 +23,10 @@ export const resolvers: Resolvers = {
   Query: {
     hello: () => 'hi',
     cats: async () => Cat.find(),
-    owners: async () => Owner.find(),
+    owners: async (_, __, ctx) => {
+      ctx.req.session!.userId = '123'
+      return Owner.find()
+    },
   },
   Mutation: {
     _: async (_, __, ctx) => ctx.customField,
@@ -29,6 +34,53 @@ export const resolvers: Resolvers = {
       const kitty = new Cat(input)
       await kitty.save()
       return kitty
+    },
+    login: async (_, { login, password }, { req }) => {
+      if (req.session!.login) {
+        return `Already logged in! ${req.session!.login}`
+      }
+
+      const existingUser = await User.findOne({ login })
+
+      if (!existingUser) {
+        throw new AuthenticationError('No such user!')
+      }
+
+      const isPass = await bcrypt.compare(password, existingUser.password)
+
+      if (!isPass) {
+        throw new AuthenticationError('Bad pass!')
+      }
+
+      req.session!.login = login
+      return `Success! ${req.session!.login}`
+    },
+    register: async (_, { login, password }, { req }) => {
+      const existingUser = await User.findOne({ login })
+
+      if (existingUser) {
+        throw new AuthenticationError('User already exists!')
+      }
+
+      const pass = await bcrypt.hash(password, 10)
+
+      const user = new User({ login, password: pass })
+
+      await user.save()
+
+      req.session!.login = login
+
+      return 'Success!'
+    },
+    logout: async (_, __, { req }) => {
+      if (req.session && req.session.login) {
+        await new Promise((resolve) => {
+          req.session!.destroy(() => resolve())
+        })
+        return `Logged out! ${JSON.stringify(req.session)}`
+      }
+
+      return `No account! ${JSON.stringify(req.session)}`
     },
     createOwner: async (_, { name }) => {
       const man = new Owner({ name })
